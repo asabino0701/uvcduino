@@ -14,6 +14,7 @@
 #include "LedControl.h"
 #include "binary.h"
 
+int inputpir = 13;
 int pinorelay = 3;  
 int t_delay = 1000, imax = 30, seg = 0;
 int t1 = 0, t2 = 0, t_total = 0;
@@ -82,6 +83,9 @@ void setup()
 
   // Relay
   pinMode(pinorelay, OUTPUT);  
+
+  // Pir Sensor
+  pinMode(inputpir, INPUT);
   
   // Display LCD 8x8
   lc.shutdown(0,false);
@@ -98,152 +102,146 @@ void setup()
 }  
   
 void loop()  
-  {  
-    if (irrecv.decode(&results))
+  {
+  if (irrecv.decode(&results))
+    {
+    if (results.value == 0XFFFFFFFF) 
       {
-      if (results.value == 0XFFFFFFFF) 
-        {
-        results.value = key_value;
-        //lc.clearDisplay(0);
-        }
-               
-        switch(results.value)
-          {
-          case 0xFFA25D:          
-          //lcd.print("CH-");
-          if (relay == true)
-            {
-            reset();
-            }
-          break;
-          case 0xFF629D:
-          //lcd.print("CH");
-          if (relay == true)
-            {
-            reset();
-            }
-          break;
-          case 0xFFE21D:
-          //lcd.print("CH+");
-          if (relay == true)
-            {
-            reset();
-            }
-          break;
-          case 0xFF22DD:
-          //lcd.print("|<<");
-          if (relay == true and t_total >= 1) // pause 
-            {
-            relay = false;
-            digitalWrite(pinorelay, LOW);
-            number_lcd(t_total);  
-            }
-          break;
-          case 0xFF02FD:
-          //lcd.print(">>|");
-          if (relay == true and t_total >= 1) // pause 
-            {
-            relay = false;
-            digitalWrite(pinorelay, LOW);
-            number_lcd(t_total);  
-            }
-          break ;  
-          case 0xFFC23D:
-          //lcd.print(">|");
-          if (t1 != 0 and t_total == 0 and relay == false)
-            {
-            t_total = t1;
-            }
-          acende_uvc();
-          break ;               
-          case 0xFFE01F:
-          //lcd.print("-");
-          if (t1 != 0 and t_total == 0 and t1 <= 9 and t1 > 1)
-            {
-            t1--;
-            number_lcd(t1);
-            }
-          else if (t_total <= 30 and t_total > 1)
-            {
-            t_total--;
-            number_lcd(t_total);
-            }
-          break ;  
-          case 0xFFA857:
-          //lcd.print("+");
-          if (t1 != 0 and t_total == 0 and t1 < 9 and t1 >= 1)
-            {
-            t1++;
-            number_lcd(t1);
-            }
-          else if (t_total < 30  and t_total >= 0)
-            {
-            t_total++;
-            number_lcd(t_total);
-            }          
-          break ;  
-          case 0xFF906F:
-          //lcd.print("EQ");
-          break ;  
-          case 0xFF6897:
-          //lcd.print("0");
-          calcula_tempo(0);
-          break ;  
-          case 0xFF9867:
-          //lcd.print("100+");
-          break ;
-          case 0xFFB04F:
-          //lcd.print("200+");
-          break ;
-          case 0xFF30CF:
-          //lcd.print("1");
-          calcula_tempo(1);
-          break ;
-          case 0xFF18E7:
-          //lcd.print("2");
-          calcula_tempo(2);
-          break ;
-          case 0xFF7A85:
-          //lcd.print("3");
-          calcula_tempo(3);
-          break ;
-          case 0xFF10EF:
-          //lcd.print("4");
-          calcula_tempo(4);
-          break ;
-          case 0xFF38C7:
-          //lcd.print("5");
-          calcula_tempo(5);
-          break ;
-          case 0xFF5AA5:
-          //lcd.print("6");
-          calcula_tempo(6);
-          break ;
-          case 0xFF42BD:
-          //lcd.print("7");
-          calcula_tempo(7);
-          break ;
-          case 0xFF4AB5:
-          //lcd.print("8");
-          calcula_tempo(8);
-          break ;
-          case 0xFF52AD:
-          //lcd.print("9");
-          calcula_tempo(9);
-          break ;                   
-          }
-        key_value = results.value;
-        irrecv.resume(); 
+      results.value = key_value;
+      //lc.clearDisplay(0);
       }
-
-
-      if (relay == true)
+             
+      switch(results.value)
         {
-        acende_uvc();  
+        case 0xFFA25D:          
+        //lcd.print("CH-");
+        if (relay == true)
+          {
+          reset();
+          }
+        break;
+        case 0xFF629D:
+        //lcd.print("CH");
+        if (relay == true)
+          {
+          reset();
+          }
+        break;
+        case 0xFFE21D:
+        //lcd.print("CH+");
+        if (relay == true)
+          {
+          reset();
+          }
+        break;
+        case 0xFF22DD:
+        //lcd.print("|<<");
+        if (relay == true and t_total >= 1) // pause 
+          {
+          reset();  
+          }
+        break;
+        case 0xFF02FD:
+        //lcd.print(">>|");
+        if (relay == true and t_total >= 1) // pause 
+          {
+          reset();  
+          }
+        break ;  
+        case 0xFFC23D:
+        //lcd.print(">|");
+        if (t1 != 0 and t_total == 0 and relay == false)
+          {
+          t_total = t1;
+          }
+        acende_uvc();
+        break ;               
+        case 0xFFE01F:
+        //lcd.print("-");
+        if (t1 != 0 and t_total == 0 and t1 <= 9 and t1 > 1)
+          {
+          t1--;
+          number_lcd(t1);
+          }
+        else if (t_total <= 30 and t_total > 1)
+          {
+          t_total--;
+          number_lcd(t_total);
+          }
+        break ;  
+        case 0xFFA857:
+        //lcd.print("+");
+        if (t1 != 0 and t_total == 0 and t1 < 9 and t1 >= 1)
+          {
+          t1++;
+          number_lcd(t1);
+          }
+        else if (t_total < 30  and t_total >= 0)
+          {
+          t_total++;
+          number_lcd(t_total);
+          }          
+        break ;  
+        case 0xFF906F:
+        //lcd.print("EQ");
+        break ;  
+        case 0xFF6897:
+        //lcd.print("0");
+        calcula_tempo(0);
+        break ;  
+        case 0xFF9867:
+        //lcd.print("100+");
+        break ;
+        case 0xFFB04F:
+        //lcd.print("200+");
+        break ;
+        case 0xFF30CF:
+        //lcd.print("1");
+        calcula_tempo(1);
+        break ;
+        case 0xFF18E7:
+        //lcd.print("2");
+        calcula_tempo(2);
+        break ;
+        case 0xFF7A85:
+        //lcd.print("3");
+        calcula_tempo(3);
+        break ;
+        case 0xFF10EF:
+        //lcd.print("4");
+        calcula_tempo(4);
+        break ;
+        case 0xFF38C7:
+        //lcd.print("5");
+        calcula_tempo(5);
+        break ;
+        case 0xFF5AA5:
+        //lcd.print("6");
+        calcula_tempo(6);
+        break ;
+        case 0xFF42BD:
+        //lcd.print("7");
+        calcula_tempo(7);
+        break ;
+        case 0xFF4AB5:
+        //lcd.print("8");
+        calcula_tempo(8);
+        break ;
+        case 0xFF52AD:
+        //lcd.print("9");
+        calcula_tempo(9);
+        break ;                   
         }
-      
-      delay(100);
-      
+      key_value = results.value;
+      irrecv.resume(); 
+    }
+
+    if (relay == true)
+      {
+      acende_uvc();  
+      }
+    
+    delay(100);
   }  
 
 void calcula_tempo(int nuentrada)
@@ -281,6 +279,20 @@ void calcula_tempo(int nuentrada)
   
   }
 
+void verificapresenca(void)
+  {
+  int pirstate = LOW;
+  
+  // Sensor de movimento x UVC Ativo.  
+  pirstate = digitalRead(inputpir);
+  if (relay == true and pirstate == HIGH)
+    {
+    reset();
+    lcd_display(fn);
+    delay(t_delay);
+    }
+  }
+
 void reset(void)
   {
   t1 = 0;
@@ -289,7 +301,7 @@ void reset(void)
   seg = 0;
   digitalWrite(pinorelay, LOW);
   relay = false;
-  lcd_display(covok);
+  //lcd_display(covok);
   }
 
 void contagem_regressiva(int nmax)
@@ -329,38 +341,52 @@ void acende_uvc(void)
     seg = 50;
     }
 
-  anima_covid();
-  
-  number_lcd(t_total);
+  verificapresenca();
 
-  for (i=5;i>=3;i--)
+  if (relay == true)
     {
-    lc.setIntensity(0,i);
-    delay(t_delay);
+    anima_covid();
+    
+    number_lcd(t_total);
+  
+    for (i=5;i>=3;i--)
+      {
+      lc.setIntensity(0,i);
+      delay(t_delay);
+      }
     }
     
-  for (i=3;i<=5;i++)
+  verificapresenca();
+
+  if (relay == true)
     {
-    lc.setIntensity(0,i);
-    delay(t_delay);
+    for (i=3;i<=5;i++)
+      {
+      lc.setIntensity(0,i);
+      delay(t_delay);
+      }
+  
+    seg -= 10;
     }
-
-  seg -= 10;
-
   }
 
 void anima_covid(void)
   {
     lcd_display(covolho);
     delay(t_delay);
+    
     lcd_display(covx);
     delay(t_delay);
+    
     lcd_display(covx2);
     delay(t_delay);
+    
     lcd_display(covx3);
     delay(t_delay);
+    
     lcd_display(covx4);
     delay(t_delay);
+    
     lc.clearDisplay(0);
   }
   
