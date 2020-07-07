@@ -153,31 +153,25 @@ void loop()
         if (t1 != 0 and t_total == 0 and relay == false)
           {
           t_total = t1;
+          t1 = 0;
+          t2 = 0;
           }
         acende_uvc();
         break ;               
         case 0xFFE01F:
         //lcd.print("-");
-        if (t1 != 0 and t_total == 0 and t1 <= 9 and t1 > 1)
+        if (t_total <= 30 and t_total > 1)
           {
-          t1--;
-          number_lcd(t1);
-          }
-        else if (t_total <= 30 and t_total > 1)
-          {
+          t1 = 0;
           t_total--;
           number_lcd(t_total);
           }
         break ;  
         case 0xFFA857:
         //lcd.print("+");
-        if (t1 != 0 and t_total == 0 and t1 < 9 and t1 >= 1)
+        if (t_total < 30  and t_total >= 0)
           {
-          t1++;
-          number_lcd(t1);
-          }
-        else if (t_total < 30  and t_total >= 0)
-          {
+          t1 = 0;
           t_total++;
           number_lcd(t_total);
           }          
@@ -368,6 +362,8 @@ void acende_uvc(void)
   
     seg -= 10;
     }
+
+  //verificapresenca();
   }
 
 void anima_covid(void)
